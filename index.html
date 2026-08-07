@@ -329,16 +329,13 @@
         <h1>What are we eating?</h1>
         <div class="option-grid" id="foodGrid" style="margin-top:22px;">
           <button type="button" class="option-card" data-food="Italian / Pasta">
-            <span class="emoji">🍝</span><span class="title">Italian / Pasta</span>
-          </button>
-          <button type="button" class="option-card" data-food="Japanese / Sushi">
-            <span class="emoji">🍣</span><span class="title">Japanese / Sushi</span>
+            <span class="emoji">🍝</span><span class="title"> Pasta</span>
           </button>
           <button type="button" class="option-card" data-food="Burgers &amp; Comfort Food">
-            <span class="emoji">🍔</span><span class="title">Burgers &amp; Comfort Food</span>
+            <span class="emoji">🍔 🍟</span><span class="title">Burgers &amp; Comfort Food</span>
           </button>
           <button type="button" class="option-card" data-food="Mexican / Tacos">
-            <span class="emoji">🌮</span><span class="title">Mexican / Tacos</span>
+            <span class="emoji">🌯</span><span class="title"> Shawarma</span>
           </button>
           <button type="button" class="option-card" data-food="Sweets &amp; Desserts">
             <span class="emoji">🍨</span><span class="title">Sweets &amp; Desserts</span>
@@ -622,10 +619,6 @@
   } catch (e) {
     console.error("Step 2 navigation setup failed:", e);
   }
-
-  /* ======================================================
-     PART 3 — vibe (single-select)
-     ====================================================== */
   let selectedVibe = null;
 
   try {
@@ -647,10 +640,6 @@
   } catch (e) {
     console.error("Part 3 setup failed:", e);
   }
-
-  /* ======================================================
-     PART 4 — food (multi-select) + submit
-     ====================================================== */
   let selectedFoods = [];
 
   try {
@@ -718,10 +707,6 @@
   } catch (e) {
     console.error("Submit setup failed:", e);
   }
-
-  /* ======================================================
-     Shared error helpers
-     ====================================================== */
   function showStepError(step, msg) {
     const box = document.getElementById("step" + step + "Error");
     if (!box) { console.warn(msg); return; }
