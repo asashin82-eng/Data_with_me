@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Quick Question 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cream:#FFF8F2;
+    --blush:#FFE1E8;
+    --blush-deep:#FFC7D3;
+    --rose:#FF6B93;
+    --rose-deep:#D6467A;
+    --sage:#9DC9A3;
+    --sage-deep:#78AE80;
+    --plum:#4A2E3B;
+    --plum-soft:#8A6B76;
+    --gold:#FFC48C;
+    --font-display:'Fredoka', sans-serif;
+    --font-body:'Nunito', sans-serif;
+    --font-script:'Caveat', cursive;
+    --shadow-soft: 0 20px 45px -20px rgba(214,70,122,0.35);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:var(--font-body);
+    color:var(--plum);
+    background:
+      radial-gradient(circle at 15% 10%, var(--blush) 0%, transparent 45%),
+      radial-gradient(circle at 85% 90%, var(--gold) 0%, transparent 40%),
+      var(--cream);
+    overflow-x:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  h1,h2{ font-family:var(--font-display); margin:0 0 8px; color:var(--plum); }
+  p{ margin:0; }
+  button{ font-family:var(--font-body); }
+
+  /* ---------- ambient floating hearts ---------- */
+  #ambientHearts{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .floaty{ position:absolute; bottom:-10%; font-size:20px; opacity:0; animation:floatUp linear infinite; }
+  @keyframes floatUp{
+    0%{ transform:translateY(0) rotate(0deg); opacity:0; }
+    10%{ opacity:.65; } 85%{ opacity:.45; }
+    100%{ transform:translateY(-115vh) rotate(25deg); opacity:0; }
+  }
+
+  #app{ position:relative; z-index:1; width:100%; max-width:520px; }
+
+  /* ---------- progress dots ---------- */
+  .progress-wrap{ text-align:center; margin-bottom:14px; }
+  .progress-dots{ display:flex; justify-content:center; gap:8px; margin-bottom:6px; }
+  .progress-dots .dot{ width:8px; height:8px; border-radius:50%; background:var(--blush-deep); transition:background .25s ease, transform .25s ease; }
+  .progress-dots .dot.filled{ background:var(--rose); }
+  .progress-dots .dot.current{ transform:scale(1.4); }
+  .progress-label{ font-size:12px; color:var(--plum-soft); }
+
+  .step{ display:none; }
+  .step.active{ display:flex; flex-direction:column; animation:stepIn .5s ease both; }
+  @keyframes stepIn{
+    from{ opacity:0; transform:translateY(14px) scale(.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .card-wrap{ position:relative; }
+  .blob{
+    position:absolute; inset:-6% -8%;
+    background:linear-gradient(135deg, var(--blush-deep), var(--gold));
+    opacity:.55; z-index:0;
+    animation:blobMorph 12s ease-in-out infinite, blobSpin 30s linear infinite;
+    border-radius:60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  @keyframes blobMorph{
+    0%,100%{ border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; }
+    25%{ border-radius:40% 60% 70% 30% / 40% 70% 30% 60%; }
+    50%{ border-radius:70% 30% 50% 50% / 30% 60% 40% 70%; }
+    75%{ border-radius:50% 50% 40% 60% / 70% 40% 60% 30%; }
+  }
+  @keyframes blobSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+
+  .card{
+    position:relative; z-index:1; background:#fff; border-radius:32px;
+    padding:40px 30px; box-shadow:var(--shadow-soft); text-align:center;
+  }
+
+  .back-link{
+    position:absolute; top:18px; left:22px; background:none; border:none;
+    font-size:13px; color:var(--plum-soft); cursor:pointer; padding:4px 6px;
+  }
+  .back-link:hover{ color:var(--rose-deep); }
+
+  .eyebrow{ font-family:var(--font-script); font-size:22px; color:var(--rose-deep); margin-bottom:2px; }
+  h1{ font-size:clamp(22px, 6vw, 30px); line-height:1.25; }
+  .subtext{ display:block; margin:12px 0 28px; color:var(--plum-soft); font-size:15px; line-height:1.6; }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    border:none; border-radius:999px; font-family:var(--font-display); font-weight:600;
+    cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, background .2s ease,
+    left .35s cubic-bezier(.34,1.56,.64,1), top .35s cubic-bezier(.34,1.56,.64,1);
+    white-space:nowrap;
+  }
+  .btn:focus-visible{ outline:3px solid var(--sage-deep); outline-offset:3px; }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--rose), var(--rose-deep)); color:#fff;
+    box-shadow:0 12px 24px -10px rgba(214,70,122,.55);
+  }
+  .btn-primary:hover{ transform:translateY(-1px); }
+  .btn-block{ width:100%; padding:16px; font-size:16px; margin-top:8px; }
+
+  /* ---------- Part 1 play zone ---------- */
+  .playzone{ position:relative; min-height:150px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; }
+  #yesBtn{ font-size:17px; padding:16px 34px; }
+  #noBtn{ background:var(--blush); color:var(--plum-soft); font-size:14px; padding:14px 24px; }
+  #noBtn.roaming{ position:absolute; }
+
+  /* ---------- Part 2 date strip ---------- */
+  .date-strip-wrap{ display:flex; align-items:center; gap:8px; margin-bottom:26px; }
+  .strip-nav{
+    flex:0 0 auto; width:32px; height:32px; border-radius:50%; border:none;
+    background:var(--cream); color:var(--rose-deep); font-size:16px; cursor:pointer;
+  }
+  .date-strip{
+    display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch; padding:4px 2px; scrollbar-width:none;
+  }
+  .date-strip::-webkit-scrollbar{ display:none; }
+  .date-card{
+    flex:0 0 auto; scroll-snap-align:center; width:60px; padding:10px 0;
+    border-radius:16px; border:2px solid transparent; background:var(--cream);
+    display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer;
+  }
+  .date-card .wd{ font-size:11px; color:var(--plum-soft); }
+  .date-card .dn{ font-family:var(--font-display); font-size:18px; font-weight:600; }
+  .date-card .mo{ font-size:10px; color:var(--plum-soft); text-transform:uppercase; letter-spacing:.4px; }
+  .date-card.selected{ border-color:var(--rose); background:var(--blush); }
+  .date-card.selected .dn{ color:var(--rose-deep); }
+
+  /* ---------- Part 2 time slider ---------- */
+  .time-slider-wrap{ text-align:center; margin-bottom:8px; }
+  .time-readout{ font-family:var(--font-display); font-size:22px; margin-bottom:10px; color:var(--rose-deep); }
+  input#timeSlider{
+    -webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:999px;
+    background:var(--blush); outline:none; cursor:pointer;
+  }
+  input#timeSlider::-webkit-slider-thumb{
+    -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:linear-gradient(135deg, var(--rose), var(--rose-deep));
+    box-shadow:0 4px 10px rgba(214,70,122,.5); cursor:pointer; border:3px solid #fff;
+  }
+  input#timeSlider::-moz-range-thumb{
+    width:26px; height:26px; border-radius:50%; border:3px solid #fff;
+    background:linear-gradient(135deg, var(--rose), var(--rose-deep));
+    box-shadow:0 4px 10px rgba(214,70,122,.5); cursor:pointer;
+  }
+  .time-slider-labels{ display:flex; justify-content:space-between; font-size:11px; color:var(--plum-soft); margin-top:6px; }
+
+  /* ---------- option grids (vibe + food) ---------- */
+  .option-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+  .option-card{
+    text-align:left; background:var(--cream); border:2px solid transparent; border-radius:18px;
+    padding:14px; cursor:pointer; transition:border-color .2s ease, transform .15s ease;
+  }
+  .option-card:hover{ transform:translateY(-2px); }
+  .option-card .emoji{ font-size:22px; display:block; margin-bottom:6px; }
+  .option-card .title{ font-family:var(--font-display); font-weight:600; font-size:14.5px; display:block; }
+  .option-card .desc{ font-size:12.5px; color:var(--plum-soft); display:block; margin-top:2px; }
+  .option-card.selected{ border-color:var(--rose); background:var(--blush); }
+  .option-card.selected .title{ color:var(--rose-deep); }
+
+  .block-hint{ display:block; text-align:left; font-size:13px; color:var(--plum-soft); margin:0 0 8px; }
+  textarea#foodNotes{
+    width:100%; min-height:70px; resize:vertical; font-family:var(--font-body); font-size:14px;
+    color:var(--plum); background:var(--cream); border:2px solid transparent; border-radius:16px;
+    padding:12px 14px; margin-bottom:14px;
+  }
+  textarea#foodNotes:focus{ outline:none; border-color:var(--blush-deep); }
+
+  .form-error{
+    display:none; background:#FFE9E1; color:var(--rose-deep); font-size:13px;
+    padding:10px 14px; border-radius:12px; margin-bottom:14px; text-align:left;
+  }
+  .form-error.show{ display:block; }
+  .shake{ animation:shake .4s ease; }
+  @keyframes shake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
+
+  #submitBtn:disabled{ opacity:.7; cursor:progress; }
+
+  /* ---------- letter (Part 5) ---------- */
+  .letter-card{ padding:48px 34px; }
+  .letter-body{ text-align:left; margin-top:18px; font-size:14.5px; line-height:1.85; color:var(--plum); }
+  .letter-body p{ margin-bottom:14px; }
+  .letter-body p:first-of-type::first-letter{
+    font-family:var(--font-script); font-size:38px; color:var(--rose-deep);
+    float:left; line-height:1; margin:2px 6px 0 0;
+  }
+  .letter-signoff{ font-family:var(--font-script); font-size:20px; color:var(--rose-deep); margin-top:6px !important; }
+
+  footer{ text-align:center; font-family:var(--font-script); font-size:15px; color:var(--plum-soft); margin-top:18px; position:relative; z-index:1; }
+
+  #confettiLayer{ position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden; }
+  .confetto{ position:absolute; top:-5%; will-change:transform, opacity; }
+
+  @media (max-width:480px){
+    .card{ padding:32px 20px; border-radius:26px; }
+    .option-grid{ gap:10px; }
+    .playzone{ min-height:190px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .floaty, .blob, .step.active, .confetto{ animation:none !important; }
+    .card, .btn{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="ambientHearts" aria-hidden="true"></div>
+<div id="confettiLayer" aria-hidden="true"></div>
+
+<div id="app">
+
+  <div class="progress-wrap">
+    <div class="progress-dots" id="progressDots" aria-hidden="true">
+      <span class="dot" data-step="1"></span>
+      <span class="dot" data-step="2"></span>
+      <span class="dot" data-step="3"></span>
+      <span class="dot" data-step="4"></span>
+      <span class="dot" data-step="5"></span>
+    </div>
+    <p class="progress-label" id="progressLabel">Step 1 of 5</p>
+  </div>
+
+  <!-- PART 1 : THE QUESTION -->
+  <section id="step1" class="step active">
+    <div class="card-wrap">
+      <div class="blob" aria-hidden="true"></div>
+      <div class="card">
+        <p class="eyebrow">psst...</p>
+        <h1>Hey <span id="crushNameSpan">there</span>, I have a quick question for you...</h1>
+        <p class="subtext">Life is short, but spending time with you would make it sweeter. Will you go on a date with me?</p>
+        <div class="playzone" id="playzone">
+          <button type="button" id="yesBtn" class="btn btn-primary">Yes 💗</button>
+          <button type="button" id="noBtn" class="btn">No</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 2 : DATE & TIME -->
+  <section id="step2" class="step">
+    <div class="card-wrap">
+      <div class="blob" aria-hidden="true" style="animation-delay:-3s;"></div>
+      <div class="card">
+        <button type="button" class="back-link" data-back="1">‹ Back</button>
+        <h1>Yay! Best decision ever! 🎉</h1>
+        <p class="subtext">When are you free?</p>
+
+        <div class="date-strip-wrap">
+          <button type="button" class="strip-nav" id="dateStripPrev" aria-label="Scroll to earlier dates">‹</button>
+          <div class="date-strip" id="dateStrip"></div>
+          <button type="button" class="strip-nav" id="dateStripNext" aria-label="Scroll to later dates">›</button>
+        </div>
+
+        <div class="time-slider-wrap">
+          <div class="time-readout" id="timeReadout">6:00 PM 🌇</div>
+          <input type="range" id="timeSlider" min="0" max="28" step="1" value="20" aria-label="Preferred time" />
+          <div class="time-slider-labels"><span>8:00 AM</span><span>10:00 PM</span></div>
+        </div>
+
+        <div id="step2Error" class="form-error"></div>
+        <button type="button" class="btn btn-primary btn-block" id="step2Next">Next Step ➔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 3 : VIBE -->
+  <section id="step3" class="step">
+    <div class="card-wrap">
+      <div class="blob" aria-hidden="true" style="animation-delay:-6s;"></div>
+      <div class="card">
+        <button type="button" class="back-link" data-back="2">‹ Back</button>
+        <h1>What's the vibe?</h1>
+        <div class="option-grid" id="vibeGrid" style="margin-top:22px;">
+          <button type="button" class="option-card" data-vibe="Coffee &amp; Cozy Walk">
+            <span class="emoji">☕</span>
+            <span class="title">Coffee &amp; Cozy Walk</span>
+            <span class="desc">Low key, good conversation, and relaxing vibes</span>
+          </button>
+          <button type="button" class="option-card" data-vibe="Foodie Adventure">
+            <span class="emoji">🍕</span>
+            <span class="title">Foodie Adventure</span>
+            <span class="desc">Exploring a fun new spot together</span>
+          </button>
+          <button type="button" class="option-card" data-vibe="Fun Activity">
+            <span class="emoji">🎨</span>
+            <span class="title">Fun Activity</span>
+            <span class="desc">Arcade, museum, or something creative</span>
+          </button>
+          <button type="button" class="option-card" data-vibe="Surprise Me!">
+            <span class="emoji">✨</span>
+            <span class="title">Surprise Me!</span>
+            <span class="desc">Leave all the planning and surprises to me!</span>
+          </button>
+        </div>
+        <div id="step3Error" class="form-error"></div>
+        <button type="button" class="btn btn-primary btn-block" id="step3Next">Next Step ➔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 4 : FOOD -->
+  <section id="step4" class="step">
+    <div class="card-wrap">
+      <div class="blob" aria-hidden="true" style="animation-delay:-9s;"></div>
+      <div class="card">
+        <button type="button" class="back-link" data-back="3">‹ Back</button>
+        <h1>What are we eating?</h1>
+        <div class="option-grid" id="foodGrid" style="margin-top:22px;">
+          <button type="button" class="option-card" data-food="Italian / Pasta">
+            <span class="emoji">🍝</span><span class="title">Italian / Pasta</span>
+          </button>
+          <button type="button" class="option-card" data-food="Japanese / Sushi">
+            <span class="emoji">🍣</span><span class="title">Japanese / Sushi</span>
+          </button>
+          <button type="button" class="option-card" data-food="Burgers &amp; Comfort Food">
+            <span class="emoji">🍔</span><span class="title">Burgers &amp; Comfort Food</span>
+          </button>
+          <button type="button" class="option-card" data-food="Mexican / Tacos">
+            <span class="emoji">🌮</span><span class="title">Mexican / Tacos</span>
+          </button>
+          <button type="button" class="option-card" data-food="Sweets &amp; Desserts">
+            <span class="emoji">🍨</span><span class="title">Sweets &amp; Desserts</span>
+          </button>
+          <button type="button" class="option-card" data-food="Boba / Cafe Treats">
+            <span class="emoji">🧋</span><span class="title">Boba / Cafe Treats</span>
+          </button>
+          <button type="button" class="option-card" data-food="Surprise me with food too!">
+            <span class="emoji">🎲</span><span class="title">Surprise me with food too!</span>
+          </button>
+        </div>
+        <label for="foodNotes" class="block-hint">Any food allergies or cravings?</label>
+        <textarea id="foodNotes" placeholder="e.g. allergic to peanuts, really craving ramen lately..."></textarea>
+        <div id="step4Error" class="form-error"></div>
+        <button type="button" class="btn btn-primary btn-block" id="submitBtn">Send Invitation Answers 💌</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 5 : LETTER -->
+  <section id="step5" class="step">
+    <div class="card-wrap">
+      <div class="blob" aria-hidden="true" style="animation-delay:-12s;"></div>
+      <div class="card letter-card">
+        <h1>A Little Note For You 💖</h1>
+        <div class="letter-body">
+          <p>Thank you for saying yes! I'm genuinely so excited to spend time with you.</p>
+          <p>I promise to bring good vibes, great food, and terrible jokes. No pressure at all—just a super fun, relaxed time where we can hang out and enjoy ourselves.</p>
+          <p>I've got everything noted down and can't wait for our date!</p>
+          <p class="letter-signoff">See you on <span id="finalDateSpan">soon</span>! ✨</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>made with lots of 💗</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ======================================================
+     CONFIG — personalize this section
+     ====================================================== */
+  const CONFIG = {
+    crushName: "Jenny",
+    emailjsPublicKey:  "bXTzitj4MisNA-E5a",
+    emailjsServiceId:  "service_mmj8mqj",
+    emailjsTemplateId: "template_2edkj8g",
+  };
+
+  const emailjsReady = !!(window.emailjs && CONFIG.emailjsPublicKey !== "YOUR_PUBLIC_KEY");
+  if (emailjsReady) {
+    emailjs.init({ publicKey: CONFIG.emailjsPublicKey });
+  } else {
+    console.warn("EmailJS isn't configured yet — replies won't be emailed until you fill in CONFIG. See the instructions at the top of this file.");
+  }
+
+  const crushNameEl = document.getElementById("crushNameSpan");
+  if (crushNameEl) crushNameEl.textContent = CONFIG.crushName || "there";
+
+  /* ======================================================
+     Ambient floating hearts
+     ====================================================== */
+  try {
+    const heartsLayer = document.getElementById("ambientHearts");
+    const heartEmojis = ["💗","✨","💕","🌸","💫"];
+    const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const HEART_COUNT = prefersReduced ? 0 : 14;
+    for (let i = 0; i < HEART_COUNT; i++) {
+      const el = document.createElement("span");
+      el.className = "floaty";
+      el.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+      el.style.left = Math.random() * 100 + "%";
+      el.style.fontSize = (14 + Math.random() * 16) + "px";
+      el.style.animationDuration = (9 + Math.random() * 8) + "s";
+      el.style.animationDelay = (Math.random() * 10) + "s";
+      heartsLayer.appendChild(el);
+    }
+  } catch (e) {
+    console.warn("Ambient hearts skipped:", e.message);
+  }
+
+  /* ======================================================
+     Confetti
+     ====================================================== */
+  const confettiLayer = document.getElementById("confettiLayer");
+  const confettiColors = ["#FF6B93", "#D6467A", "#FFC48C", "#9DC9A3", "#FFC7D3"];
+  const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  function burstConfetti() {
+    if (reduceMotion || !confettiLayer) return;
+    const count = 46;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("span");
+      piece.className = "confetto";
+      const size = 6 + Math.random() * 6;
+      const isCircle = Math.random() > 0.5;
+      piece.style.width = size + "px";
+      piece.style.height = (isCircle ? size : size * 1.6) + "px";
+      piece.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      piece.style.borderRadius = isCircle ? "50%" : "3px";
+      piece.style.left = Math.random() * 100 + "%";
+
+      const duration = 2200 + Math.random() * 1600;
+      const drift = (Math.random() * 200 - 100);
+      const spin = 360 + Math.random() * 540;
+
+      confettiLayer.appendChild(piece);
+      try {
+        if (typeof piece.animate === "function") {
+          piece.animate([
+            { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+            { transform: `translate(${drift}px, 105vh) rotate(${spin}deg)`, opacity: 0.9 }
+          ], { duration, easing: "cubic-bezier(.25,.46,.45,.94)", delay: Math.random() * 250 });
+        }
+      } catch (e) {
+        console.warn("Confetti animation skipped:", e.message);
+      }
+      setTimeout(() => piece.remove(), duration + 400);
+    }
+  }
+
+  /* ======================================================
+     Step navigation
+     ====================================================== */
+  const TOTAL_STEPS = 5;
+  let currentStep = 1;
+
+  function updateProgress() {
+    document.querySelectorAll(".progress-dots .dot").forEach(dot => {
+      const n = Number(dot.dataset.step);
+      dot.classList.toggle("filled", n <= currentStep);
+      dot.classList.toggle("current", n === currentStep);
+    });
+    const label = document.getElementById("progressLabel");
+    if (label) label.textContent = `Step ${currentStep} of ${TOTAL_STEPS}`;
+  }
+
+  function goToStep(n) {
+    currentStep = n;
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    const target = document.getElementById("step" + n);
+    if (target) target.classList.add("active");
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.querySelectorAll(".back-link").forEach(btn => {
+    btn.addEventListener("click", () => goToStep(Number(btn.dataset.back)));
+  });
+
+  updateProgress();
+
+  /* ======================================================
+     PART 1 — the Yes/No chase
+     ====================================================== */
+  try {
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const playzone = document.getElementById("playzone");
+
+    const noMessages = [
+      "Are you sure? 🥺", "Really sure?? 💔", "Think again! ✨",
+      "Give it one more thought! 🌹", "You're clicking the wrong button! 😂",
+      "Just click Yes already! 🚀"
+    ];
+    let noClicks = 0;
+
+    function repositionNoButton() {
+      noBtn.classList.add("roaming");
+      const zoneRect = playzone.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      const maxLeft = Math.max(zoneRect.width - btnRect.width, 0);
+      const maxTop = Math.max(zoneRect.height - btnRect.height, 0);
+      noBtn.style.left = (Math.random() * maxLeft) + "px";
+      noBtn.style.top = (Math.random() * maxTop) + "px";
+    }
+
+    noBtn.addEventListener("click", () => {
+      noClicks++;
+      const yesScale = Math.min(1 + noClicks * 0.25, 2.6);
+      const noScale = Math.max(1 - noClicks * 0.15, 0.45);
+      yesBtn.style.transform = `scale(${yesScale})`;
+      noBtn.style.transform = `scale(${noScale})`;
+      noBtn.textContent = noMessages[Math.min(noClicks - 1, noMessages.length - 1)];
+      playzone.style.minHeight = "190px";
+      requestAnimationFrame(repositionNoButton);
+    });
+
+    yesBtn.addEventListener("click", () => {
+      try { burstConfetti(); } catch (e) { console.warn("Confetti skipped:", e.message); }
+      goToStep(2);
+    });
+  } catch (e) {
+    console.error("Part 1 setup failed:", e);
+  }
+
+  /* ======================================================
+     PART 2 — shared state + date strip + time slider
+     ====================================================== */
+  let selectedDateISO = null;
+  let selectedTimeMinutes = null; // minutes from midnight
+  let selectedTimeLabel = null;
+
+  try {
+    const dateStrip = document.getElementById("dateStrip");
+    const stripPrev = document.getElementById("dateStripPrev");
+    const stripNext = document.getElementById("dateStripNext");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const DAYS_TO_SHOW = 45;
+
+    let html = "";
+    for (let i = 0; i < DAYS_TO_SHOW; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const wd = d.toLocaleDateString("en-US", { weekday: "short" });
+      const mo = d.toLocaleDateString("en-US", { month: "short" });
+      html += `<button type="button" class="date-card" data-date="${iso}"><span class="wd">${wd}</span><span class="dn">${d.getDate()}</span><span class="mo">${mo}</span></button>`;
+    }
+    dateStrip.innerHTML = html;
+
+    dateStrip.querySelectorAll(".date-card").forEach(card => {
+      card.addEventListener("click", () => {
+        dateStrip.querySelectorAll(".date-card").forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedDateISO = card.dataset.date;
+        clearStepError(2);
+      });
+    });
+
+    stripPrev.addEventListener("click", () => dateStrip.scrollBy({ left: -220, behavior: "smooth" }));
+    stripNext.addEventListener("click", () => dateStrip.scrollBy({ left: 220, behavior: "smooth" }));
+  } catch (e) {
+    console.error("Date strip setup failed:", e);
+  }
+
+  try {
+    const slider = document.getElementById("timeSlider");
+    const readout = document.getElementById("timeReadout");
+
+    function stepToLabel(step) {
+      const totalMinutes = 8 * 60 + step * 30; // 8:00 AM start, 30-min steps
+      const h24 = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      const period = h24 >= 12 ? "PM" : "AM";
+      let h12 = h24 % 12; if (h12 === 0) h12 = 12;
+      const emoji = h24 < 12 ? "🌅" : h24 < 17 ? "☀️" : h24 < 20 ? "🌇" : "🌙";
+      const label = `${h12}:${String(m).padStart(2, "0")} ${period}`;
+      return { totalMinutes, label, emoji };
+    }
+
+    function renderSlider() {
+      const { totalMinutes, label, emoji } = stepToLabel(Number(slider.value));
+      readout.textContent = `${label} ${emoji}`;
+      selectedTimeMinutes = totalMinutes;
+      selectedTimeLabel = label;
+      slider.setAttribute("aria-valuetext", label);
+      const pct = (Number(slider.value) / Number(slider.max)) * 100;
+      slider.style.background = `linear-gradient(to right, var(--rose) ${pct}%, var(--blush) ${pct}%)`;
+    }
+
+    slider.addEventListener("input", () => { renderSlider(); clearStepError(2); });
+    renderSlider(); // initialize readout + default selection
+  } catch (e) {
+    console.error("Time slider setup failed:", e);
+  }
+
+  try {
+    document.getElementById("step2Next").addEventListener("click", () => {
+      if (!selectedDateISO) { showStepError(2, "Pick a date on the strip above! 📅"); return; }
+      clearStepError(2);
+      goToStep(3);
+    });
+  } catch (e) {
+    console.error("Step 2 navigation setup failed:", e);
+  }
+
+  /* ======================================================
+     PART 3 — vibe (single-select)
+     ====================================================== */
+  let selectedVibe = null;
+
+  try {
+    const vibeCards = document.querySelectorAll("#vibeGrid .option-card");
+    vibeCards.forEach(card => {
+      card.addEventListener("click", () => {
+        vibeCards.forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedVibe = card.dataset.vibe;
+        clearStepError(3);
+      });
+    });
+
+    document.getElementById("step3Next").addEventListener("click", () => {
+      if (!selectedVibe) { showStepError(3, "Pick a vibe up above! 👆"); return; }
+      clearStepError(3);
+      goToStep(4);
+    });
+  } catch (e) {
+    console.error("Part 3 setup failed:", e);
+  }
+
+  /* ======================================================
+     PART 4 — food (multi-select) + submit
+     ====================================================== */
+  let selectedFoods = [];
+
+  try {
+    const foodCards = document.querySelectorAll("#foodGrid .option-card");
+    foodCards.forEach(card => {
+      card.addEventListener("click", () => {
+        const food = card.dataset.food;
+        card.classList.toggle("selected");
+        if (card.classList.contains("selected")) {
+          if (!selectedFoods.includes(food)) selectedFoods.push(food);
+        } else {
+          selectedFoods = selectedFoods.filter(f => f !== food);
+        }
+        clearStepError(4);
+      });
+    });
+  } catch (e) {
+    console.error("Food card setup failed:", e);
+  }
+
+  try {
+    const submitBtn = document.getElementById("submitBtn");
+
+    function formatSelectedDate() {
+      const [y, m, d] = selectedDateISO.split("-").map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      return dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+    }
+
+    submitBtn.addEventListener("click", async () => {
+      if (selectedFoods.length === 0) { showStepError(4, "Pick at least one option — 'Surprise me' totally counts! 🎲"); return; }
+
+      clearStepError(4);
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+
+      const formattedDate = formatSelectedDate();
+      const payload = {
+        recipient_name: CONFIG.crushName,
+        selected_date: formattedDate,
+        selected_time: selectedTimeLabel,
+        date_vibe: selectedVibe,
+        food_choices: selectedFoods.join(", "),
+        food_notes: document.getElementById("foodNotes").value.trim() || "None noted",
+        submitted_at: new Date().toLocaleString()
+      };
+
+      try {
+        if (!emailjsReady) throw new Error("EmailJS not configured");
+        await emailjs.send(CONFIG.emailjsServiceId, CONFIG.emailjsTemplateId, payload);
+      } catch (err) {
+        console.warn("Email send skipped or failed:", err.message);
+        // Flow still continues so testing isn't blocked; configure EmailJS to actually deliver.
+      }
+
+      const finalDateSpan = document.getElementById("finalDateSpan");
+      if (finalDateSpan) finalDateSpan.textContent = formattedDate;
+
+      try { burstConfetti(); } catch (e) { console.warn("Confetti skipped:", e.message); }
+      goToStep(5);
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send Invitation Answers 💌";
+    });
+  } catch (e) {
+    console.error("Submit setup failed:", e);
+  }
+
+  /* ======================================================
+     Shared error helpers
+     ====================================================== */
+  function showStepError(step, msg) {
+    const box = document.getElementById("step" + step + "Error");
+    if (!box) { console.warn(msg); return; }
+    box.textContent = msg;
+    box.classList.add("show");
+    box.classList.add("shake");
+    setTimeout(() => box.classList.remove("shake"), 400);
+  }
+  function clearStepError(step) {
+    const box = document.getElementById("step" + step + "Error");
+    if (box) box.classList.remove("show");
+  }
+
+})();
+</script>
+</body>
+</html>
